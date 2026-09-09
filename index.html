@@ -70,14 +70,14 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
   .chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
 
   /* ---------- grid ---------- */
-  .wrap{max-width:760px; margin:0 auto; padding:12px 10px 90px;}
+  .wrap{max-width:760px; margin:0 auto; padding:10px 6px 88px;}
   .grid{
-    display:grid; gap:6px;
-    grid-template-columns:54px repeat(var(--days), 1fr);
+    display:grid; gap:4px;
+    grid-template-columns:42px repeat(var(--days), 1fr);
   }
-  .corner{font-size:11px; color:var(--muted); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px;}
+  .corner{font-size:10px; color:var(--muted); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px;}
   .day-head{
-    text-align:center; font-size:13px; font-weight:600; padding:8px 0; border-radius:10px;
+    text-align:center; font-size:12px; font-weight:600; padding:7px 0; border-radius:9px;
     background:var(--panel); border:1px solid var(--line); position:relative;
   }
   .day-head.today{background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 2px 8px rgba(99,102,241,.35);}
@@ -85,24 +85,24 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
     border-radius:999px; padding:1px 5px; font-weight:700; border:2px solid var(--bg);}
   .period{
     display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
-    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:4px 2px;
+    background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:4px 2px;
   }
-  .period b{font-size:12px; font-weight:600;}
-  .period span{font-size:9.5px; color:var(--muted); margin-top:2px; word-break:break-all;}
+  .period b{font-size:11px; font-weight:600;}
+  .period span{font-size:8px; color:var(--muted); margin-top:2px; line-height:1.25; word-break:break-all;}
   .cell{
-    background:var(--panel); border:1px solid var(--line); border-radius:10px;
-    min-height:96px; padding:4px; display:flex; flex-direction:column; gap:4px; position:relative;
+    background:var(--panel); border:1px solid var(--line); border-radius:9px;
+    min-height:64px; padding:3px; display:flex; flex-direction:column; gap:3px; position:relative;
   }
   .cell.today{border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent);}
   .cell.editing{border-style:dashed; border-color:var(--accent);}
   .block{
-    border-radius:9px; color:#fff; padding:6px 7px; font-size:11.5px; line-height:1.35;
+    border-radius:8px; color:#fff; padding:5px 6px; font-size:11px; line-height:1.3;
     cursor:pointer; position:relative; overflow:hidden;
     box-shadow:0 1px 3px rgba(0,0,0,.16); word-break:break-word;
   }
   .block .nm{font-weight:600;}
-  .block .meta{font-size:10px; opacity:.92; margin-top:2px;}
-  .block .wk{display:inline-block; font-size:9.5px; background:rgba(255,255,255,.24); border-radius:5px; padding:0 5px; margin-top:3px;}
+  .block .meta{font-size:9px; opacity:.92; margin-top:2px;}
+  .block .wk{display:inline-block; font-size:8.5px; background:rgba(255,255,255,.24); border-radius:5px; padding:0 4px; margin-top:3px;}
   .block .del{
     position:absolute; top:2px; right:2px; width:18px; height:18px; border-radius:50%;
     background:rgba(0,0,0,.35); color:#fff; font-size:12px; line-height:1; display:none;
@@ -347,6 +347,26 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
     '工程数学':'#0891b2'
   };
 
+  // 手机一屏显示用的课程简称（点开详情仍显示全称）
+  var SHORT_MAP = {
+    '低压电器与可编程控制器课程设计':'PLC设计',
+    '低压电器与可编程控制器Ⅲ':'PLCⅢ',
+    '自动控制原理':'自控原理',
+    '机器人控制技术Ⅰ':'机器人控制',
+    '大学英语Ⅳ(一)':'大学英语',
+    '数字图像处理Ⅰ':'图像处理',
+    'C语言程序设计Ⅶ':'C语言',
+    '嵌入式技术':'嵌入式',
+    '工程数学':'工程数学'
+  };
+  function shortName(name){
+    var m = name.match(/[★☆◆■●◇▲△▽※]\s*$/);
+    var mark = m ? m[0].trim() : '';
+    var base = name.replace(/[★☆◆■●◇▲△▽※]\s*$/,'').trim();
+    if(SHORT_MAP[base]) base = SHORT_MAP[base];
+    return base + mark;
+  }
+
   /* ============ 状态 ============ */
   var data = [];
   var settings = { termStart:'2026-08-31', theme:'light', week:'auto' }; // week: 'auto' | 'all' | number
@@ -491,7 +511,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
       var pl = document.createElement('div');
       pl.className = 'period';
       var b = document.createElement('b'); b.textContent = per.key + '节';
-      var s = document.createElement('span'); s.textContent = per.time;
+      var s = document.createElement('span'); s.innerHTML = per.time.replace('-', '<br>');
       pl.appendChild(b); pl.appendChild(s);
       grid.appendChild(pl);
 
@@ -529,7 +549,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
     b.style.background = colorOf(e.name);
     b.setAttribute('data-idx', idx);
     var nm = document.createElement('div');
-    nm.className = 'nm'; nm.textContent = e.name;
+    nm.className = 'nm'; nm.textContent = shortName(e.name);
     var meta = document.createElement('div');
     meta.className = 'meta'; meta.textContent = e.loc + (e.teacher ? ' · ' + e.teacher : '');
     b.appendChild(nm); b.appendChild(meta);
