@@ -27,6 +27,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0;}
   body{
+    display:flex; flex-direction:column; min-height:100vh; min-height:100dvh;
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",Roboto,sans-serif;
     background:var(--bg); color:var(--text); font-size:15px; line-height:1.45;
     -webkit-font-smoothing:antialiased;
@@ -35,7 +36,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
 
   /* ---------- header ---------- */
   header{
-    position:sticky; top:0; z-index:20;
+    position:sticky; top:0; z-index:20; flex:0 0 auto;
     background:var(--head-bg); backdrop-filter:saturate(180%) blur(12px);
     -webkit-backdrop-filter:saturate(180%) blur(12px);
     border-bottom:1px solid var(--line); padding:10px 14px calc(env(safe-area-inset-top,0px) + 10px);
@@ -70,9 +71,9 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
   .chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
 
   /* ---------- grid ---------- */
-  .wrap{max-width:760px; margin:0 auto; padding:8px 0 calc(env(safe-area-inset-bottom,0px) + 12px);}
+  .wrap{flex:1 0 auto; display:flex; flex-direction:column; width:100%; padding:8px 0 calc(env(safe-area-inset-bottom,0px) + 12px);}
   .grid{
-    display:grid; gap:4px;
+    flex:1 0 auto; display:grid; gap:4px;
     grid-template-columns:42px repeat(var(--days), 1fr);
   }
   .corner{font-size:10px; color:var(--muted); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px;}
@@ -139,7 +140,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
   }
   .overlay.show{display:flex;}
   .sheet{
-    width:100%; max-width:760px; background:var(--panel); border-radius:20px 20px 0 0;
+    width:100%; background:var(--panel); border-radius:20px 20px 0 0;
     padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 18px); max-height:86vh; overflow:auto;
     animation:up .18s ease;
   }
@@ -485,6 +486,8 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
     var days = [];
     for(var d=1; d<=maxDay(); d++) days.push(d);
     grid.style.setProperty('--days', days.length);
+    var periods = renderPeriods();
+    grid.style.gridTemplateRows = 'auto repeat(' + periods.length + ', 1fr)';
     grid.innerHTML = '';
 
     // corner
@@ -507,7 +510,7 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').
     });
 
     // rows
-    renderPeriods().forEach(function(per){
+    periods.forEach(function(per){
       var pl = document.createElement('div');
       pl.className = 'period';
       var b = document.createElement('b'); b.textContent = per.key + '节';
